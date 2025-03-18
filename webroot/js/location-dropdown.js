@@ -1,0 +1,77 @@
+// webroot/js/location-dropdown.js
+document.addEventListener("DOMContentLoaded", function() {
+    const countryDropdown = document.getElementById('country-dropdown');
+    const stateDropdown = document.getElementById('state-dropdown');
+    const cityDropdown = document.getElementById('city-dropdown');
+
+    const API_KEY = 'SmNzN3BHZTFvRTlmQW43MG01M0hleThOVFFGVnF6c0RPbEF4cmJIRQ=='; 
+    const BASE_URL = 'https://api.countrystatecity.in/v1/';
+
+    function fetchCountries() {
+        fetch(`${BASE_URL}countries`, {
+            headers: {
+                "X-CSCAPI-KEY": API_KEY
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            countryDropdown.innerHTML = '<option value="">Select Country</option>';
+            data.forEach(country => {
+                countryDropdown.innerHTML += `<option value="${country.iso2}">${country.name}</option>`;
+            });
+        });
+    }
+
+    function fetchStates(countryCode) {
+        fetch(`${BASE_URL}countries/${countryCode}/states`, {
+            headers: {
+                "X-CSCAPI-KEY": API_KEY
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            stateDropdown.innerHTML = '<option value="">Select State</option>';
+            data.forEach(state => {
+                stateDropdown.innerHTML += `<option value="${state.iso2}">${state.name}</option>`;
+            });
+        });
+    }
+
+    function fetchCities(countryCode, stateCode) {
+        fetch(`${BASE_URL}countries/${countryCode}/states/${stateCode}/cities`, {
+            headers: {
+                "X-CSCAPI-KEY": API_KEY
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            cityDropdown.innerHTML = '<option value="">Select City</option>';
+            data.forEach(city => {
+                cityDropdown.innerHTML += `<option value="${city.name}">${city.name}</option>`;
+            });
+        });
+    }
+
+    countryDropdown.addEventListener('change', function() {
+        const countryCode = this.value;
+        if (countryCode) {
+            fetchStates(countryCode);
+        } else {
+            stateDropdown.innerHTML = '<option value="">Select State</option>';
+            cityDropdown.innerHTML = '<option value="">Select City</option>';
+        }
+    });
+
+    stateDropdown.addEventListener('change', function() {
+        const countryCode = countryDropdown.value;
+        const stateCode = this.value;
+        if (countryCode && stateCode) {
+            fetchCities(countryCode, stateCode);
+        } else {
+            cityDropdown.innerHTML = '<option value="">Select City</option>';
+        }
+    });
+
+    // Initialize the country dropdown on page load
+    fetchCountries();
+});
