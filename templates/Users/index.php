@@ -6,7 +6,7 @@
   <meta charset="utf-8">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
 
-  <title>Dashboard - NiceAdmin Bootstrap Template</title>
+  <title>Users</title>
   <meta content="" name="description">
   <meta content="" name="keywords">
 
@@ -48,7 +48,6 @@
     <div class="countries index content">
       <div class = "d-flex justify-content-between">
       <h4><?= __('Users') ?></h4>
-      <?= $this->Html->link(__('+ New User'), ['action' => 'add'], ['class' => 'btn btn-primary float-end mb-3']) ?>
 </div>
    
         <hr>
@@ -94,7 +93,15 @@
                     <td><?= h($user->country). ', ' .$user->state. ', ' .$user->city ?></td>
                     <td><?= h($user->created) ?></td>
                     <td class="actions">
-                        <?= $this->Form->postLink(__('Delete'), ['action' => 'delete', $user->id], ['confirm' => __('Are you sure you want to delete # {0}?', $user->id)]) ?>
+<?= $this->Form->postLink(
+    '<i class="bi bi-trash"></i> ' . __('Delete'), 
+    ['action' => 'delete', $user->id], 
+    [
+        'confirm' => __('Are you sure you want to delete # {0}?', $user->id), 
+        'class' => 'btn btn-danger text-light btn-sm', 
+        'escape' => false
+    ]
+) ?>
                     </td>
                 </tr>
                 <?php endforeach; ?>

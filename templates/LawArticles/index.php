@@ -48,7 +48,6 @@
     <div class="countries index content">
       <div class = "d-flex justify-content-between">
       <h4><?= __('Law Articles') ?></h4>
-      <?= $this->Html->link(__('+ New Law Article'), ['action' => 'add'], ['class' => 'btn btn-primary float-end mb-3']) ?>
 </div>
    
         <hr>
@@ -97,7 +96,6 @@
         <td><?= h($lawArticle->views) ?></td>
         <td class="actions">
             <?= $this->Html->link(__('View'), ['action' => 'view', $lawArticle->id]) ?>
-            <?= $this->Html->link(__('Edit'), ['action' => 'edit', $lawArticle->id]) ?>
             <?= $this->Form->postLink(__('Delete'), ['action' => 'delete', $lawArticle->id], ['confirm' => __('Are you sure you want to delete # {0}?', $lawArticle->id)]) ?>
         </td>
     </tr>

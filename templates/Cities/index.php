@@ -10,7 +10,7 @@
   <meta charset="utf-8">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
 
-  <title>States</title>
+  <title>Cities</title>
   <meta content="" name="description">
   <meta content="" name="keywords">
 
@@ -51,7 +51,7 @@
     <div class="section col-md-9 mt-2">
     <div class="countries index content">
       <div class = "d-flex justify-content-between">
-      <h4><?= __('States List') ?></h4>
+      <h4><?= __('Cities List') ?></h4>
 </div>
    
         <hr>
@@ -62,7 +62,7 @@
             <?= $this->Form->control('search', [
                 'label' => false,
                 'value' => $search,
-                'placeholder' => 'Search State...',
+                'placeholder' => 'Search Cities...',
                 'class' => 'form-control'
             ]) ?>
             <?= $this->Form->end() ?>
@@ -74,7 +74,7 @@
                 <tr>
                 <th><?= __('Country Id') ?></th>
                     <th><?= __('Country Code') ?></th>
-                                        <th><?= __('Country Name') ?></th>
+                                        <th><?= __('Cities List') ?></th>
 
                 </tr>
                 </thead>
@@ -84,11 +84,7 @@
                     <td><?= $this->Number->format($city->id) ?></td>
                     <td><?= h($city->name) ?></td>
                     <td><?= $city->has('state') ? $this->Html->link($city->state->name, ['controller' => 'States', 'action' => 'view', $city->state->id]) : '' ?></td>
-                    <td class="actions">
-                        <?= $this->Html->link(__('View'), ['action' => 'view', $city->id]) ?>
-                        <?= $this->Html->link(__('Edit'), ['action' => 'edit', $city->id]) ?>
-                        <?= $this->Form->postLink(__('Delete'), ['action' => 'delete', $city->id], ['confirm' => __('Are you sure you want to delete # {0}?', $city->id)]) ?>
-                    </td>
+                
                 </tr>
                 <?php endforeach; ?>
             </tbody>

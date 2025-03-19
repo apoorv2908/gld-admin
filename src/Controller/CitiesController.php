@@ -18,12 +18,21 @@ class CitiesController extends AppController
      */
     public function index()
     {
+
+        $search = $this->request->getQuery('search');
+        $conditions = [];
+    
+        if ($search) {
+            $conditions['OR'] = [
+                'Countries.name LIKE' => '%' . $search . '%',
+            ];
+        }
         $this->paginate = [
             'contain' => ['States'],
         ];
         $cities = $this->paginate($this->Cities);
 
-        $this->set(compact('cities'));
+        $this->set(compact('cities', 'search'));
     }
 
     /**

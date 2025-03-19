@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
 
-  <title>Listings Suspended</title>
+  <title>Suspended Listings</title>
   <meta content="" name="description">
   <meta content="" name="keywords">
 
@@ -57,7 +57,7 @@
             <?= $this->Form->control('search', [
                 'label' => false,
                 'value' => $search,
-                'placeholder' => 'Search users...',
+                'placeholder' => 'Search Listing...',
                 'class' => 'form-control'
             ]) ?>
             <?= $this->Form->end() ?>
@@ -67,14 +67,14 @@
         <table class="table table-striped">
     <thead class="table-light">
         <tr>
-            <th><?= __('No.') ?></th>
+            <th><?= __('S No.') ?></th>
             <th><?= $this->Paginator->sort('listing Id') ?></th>
             <th><?= $this->Paginator->sort('name') ?></th>
             <th><?= $this->Paginator->sort('email') ?></th>
             <th><?= $this->Paginator->sort('listing_category') ?></th>
             <th><?= $this->Paginator->sort('user Id') ?></th>
-            <th><?= __('Status') ?></th>
-            <th><?= __('Listing Status') ?></th>
+            <th><?= __('Toggle Status') ?></th>
+            <th><?= __('Current Status') ?></th>
             <th class="actions"><?= __('Actions') ?></th>
         </tr>
     </thead>
@@ -84,27 +84,40 @@
         foreach ($listings as $index => $listing): ?>
         <tr>
             <td><?= $start + $index + 1 ?></td>
-            <td><?= h($listing->listing_id) ?></td>
+<td>
+    <?= $this->Html->link(h($listing->listing_id), ['controller' => 'Listings', 'action' => 'view', $listing->id], ['escape' => false]) ?>
+</td>
             <td><?= h($listing->firstname). ' ' . h($listing->lastname) ?></td>
             <td><?= h($listing->email) ?></td>
             <td><?= h($listing->listing_type) ?></td>
             <td><?= h($listing->user_id) ?></td>
-            <td>
-                <?= $this->Form->create(null, ['url' => ['action' => 'index'], 'type' => 'post']) ?>
-                <?= $this->Form->hidden('listing_id', ['value' => $listing->id]) ?>
-                <?= $this->Form->select('status', [
-                    '0' => '--Pending Approval--',
-                    '1' => 'Approve',
-                    '2' => 'Suspend'
-                ], [
-                    'value' => $listing->status == 1 ? '1' : ($listing->is_suspended == 1 ? '2' : '0'),
-                    'onchange' => 'this.form.submit()'
-                ]) ?>
-                <?= $this->Form->end() ?>
-            </td>
-            <td><?= h($listing->listing_status) ?></td>
+           <td>
+    <?= $this->Form->create(null, ['url' => ['action' => 'index'], 'type' => 'post']) ?>
+    <?= $this->Form->hidden('listing_id', ['value' => $listing->id]) ?>
+   <?= $this->Form->select('status', [
+    '0' => '--Pending Approval--',
+    '1' => 'Approve',
+    '2' => 'Suspend'
+], [
+    'value' => ($listing->status == 1) ? '1' : (($listing->is_suspended == 1) ? '2' : '0'),
+    'onchange' => 'this.form.submit()',
+    'class' => 'form-control'
+]) ?>
+
+    <?= $this->Form->end() ?>
+</td>
+
+<td>
+    <?php
+    $status = $listing->listing_status;
+    $statusColor = ($status == 'Approved') ? 'green' : (($status == 'Suspended') ? 'red' : 'blue');
+    ?>
+    <span style="color: <?= $statusColor ?>; font-weight: bold;">
+        <?= h($status) ?>
+    </span>
+</td>
             <td class="actions">
-                <?= $this->Html->link(__('Edit'), ['action' => 'edit', $listing->id]) ?>
+                <?= $this->Html->link(__('View'), ['action' => 'view', $listing->id]) ?>
                 <?= $this->Form->postLink(__('Delete'), ['action' => 'delete', $listing->id], ['confirm' => __('Are you sure you want to delete # {0}?', $listing->id)]) ?>
             </td>
         </tr>

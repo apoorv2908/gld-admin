@@ -59,7 +59,7 @@
             <div class="col-12 fw-bold">
         <?= $this->Form->control('category', [
             'class' => 'form-control', 
-            'label' => ['class' => 'form-label', 'text' => 'Category Title']
+            'label' => ['class' => 'form-label', 'text' => 'Category Title*']
         ]) ?>
     </div>
 

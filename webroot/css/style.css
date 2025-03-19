@@ -1,11 +1,8 @@
-@import url("https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap");
-
 :root {
     scroll-behavior: smooth;
 }
 
 body {
-    font-family: "Nunito";
     background: #f6f9ff;
     color: #444444;
 }
@@ -333,12 +330,12 @@ h6 {
 
 .nav-tabs-bordered .nav-link:hover,
 .nav-tabs-bordered .nav-link:focus {
-    color: #4154f1;
+    color: rgb(15, 15, 15);
 }
 
 .nav-tabs-bordered .nav-link.active {
     background-color: #fff;
-    color: #4154f1;
+    color: rgb(15, 15, 15);
     border-bottom: 2px solid #4154f1;
 }
 
@@ -370,7 +367,7 @@ h6 {
 .header {
     transition: all 0.5s;
     z-index: 997;
-    height: 60px;
+    height: 70px;
     box-shadow: 0px 2px 20px rgba(1, 41, 112, 0.1);
     background-color: #fff;
     padding-left: 20px;
@@ -673,7 +670,7 @@ h6 {
     align-items: center;
     font-size: 15px;
     font-weight: 600;
-    color: #4154f1;
+    color: rgb(15, 15, 15);
     transition: 0.3;
     padding: 10px 15px;
     border-radius: 4px;
@@ -682,7 +679,7 @@ h6 {
 .sidebar-nav .nav-link i {
     font-size: 16px;
     margin-right: 10px;
-    color: #4154f1;
+    color: rgb(15, 15, 15);
 }
 
 .sidebar-nav .nav-link.collapsed {

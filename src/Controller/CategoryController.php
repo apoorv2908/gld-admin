@@ -34,7 +34,7 @@ class CategoryController extends AppController
         $this->paginate = [
             'conditions' => $conditions,
             'limit' => 10,
-            'order' => ['Category.category' => 'asc'],
+            'order' => ['Category.category' => 'desc'],
         ];
     
         $category = $this->paginate($this->Category->find());

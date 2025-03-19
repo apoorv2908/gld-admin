@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
 
-  <title>Dashboard - NiceAdmin Bootstrap Template</title>
+  <title>Listings</title>
   <meta content="" name="description">
   <meta content="" name="keywords">
 
@@ -47,7 +47,6 @@
     <div class="countries index content">
       <div class = "d-flex justify-content-between">
       <h4><?= __('Listings') ?></h4>
-      <?= $this->Html->link(__('+ New Listing'), ['action' => 'add'], ['class' => 'btn btn-primary float-end mb-3']) ?>
 </div>
    
         <hr>

@@ -35,7 +35,7 @@ class StatesController extends AppController
         ];
         $states = $this->paginate($this->States);
 
-        $this->set(compact('states'));
+        $this->set(compact('states', 'search'));
     }
 
     /**
@@ -72,7 +72,7 @@ class StatesController extends AppController
             $this->Flash->error(__('The state could not be saved. Please, try again.'));
         }
         $countries = $this->States->Countries->find('list', ['limit' => 200])->all();
-        $this->set(compact('state', 'countries'));
+        $this->set(compact('state', 'countries' ));
     }
 
     /**

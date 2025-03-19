@@ -6,7 +6,7 @@
   <meta charset="utf-8">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
 
-  <title>Practice Area</title>
+  <title>Practice Areas</title>
   <meta content="" name="description">
   <meta content="" name="keywords">
 
@@ -48,7 +48,7 @@
     <div class="countries index content">
       <div class = "d-flex justify-content-between">
       <h4><?= __('Practice Area') ?></h4>
-      <?= $this->Html->link(__('+ New Practicearea'), ['action' => 'add'], ['class' => 'btn btn-primary float-end mb-3']) ?>
+      <?= $this->Html->link(__('+ New Practice Area'), ['action' => 'add'], ['class' => 'btn btn-primary float-end mb-3']) ?>
 </div>
    
         <hr>
@@ -59,7 +59,7 @@
             <?= $this->Form->control('search', [
                 'label' => false,
                 'value' => $search,
-                'placeholder' => 'Search Practice Area...',
+                'placeholder' => 'Search Practice Areas...',
                 'class' => 'form-control'
             ]) ?>
             <?= $this->Form->end() ?>

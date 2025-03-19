@@ -80,25 +80,54 @@ class ListingsController extends AppController
 
     public function suspendedListings()
     {
+         $search = $this->request->getQuery('search');
+        $conditions = [];
+    
+        if ($search) {
+            $conditions['OR'] = [
+            'Listings.firstname LIKE' => '%' . $search . '%',
+            'Listings.lastname LIKE' => '%' . $search . '%',
+            'Listings.email LIKE' => '%' . $search . '%',
+            'Listings.listing_id LIKE' => '%' . $search . '%',
+            'Listings.country LIKE' => '%' . $search . '%',
+            'Listings.state LIKE' => '%' . $search . '%',
+            'Listings.city LIKE' => '%' . $search . '%',
+        ];
+        }
         $this->paginate = [
             'contain' => ['Users'],
             'conditions' => ['Listings.is_suspended' => 1],
         ];
         $listings = $this->paginate($this->Listings);
     
-        $this->set(compact('listings'));
+        $this->set(compact('listings', 'search'));
     }
 
 
     public function pendingListings()
     {
+
+         $search = $this->request->getQuery('search');
+        $conditions = [];
+    
+        if ($search) {
+            $conditions['OR'] = [
+            'Listings.firstname LIKE' => '%' . $search . '%',
+            'Listings.lastname LIKE' => '%' . $search . '%',
+            'Listings.email LIKE' => '%' . $search . '%',
+            'Listings.listing_id LIKE' => '%' . $search . '%',
+            'Listings.country LIKE' => '%' . $search . '%',
+            'Listings.state LIKE' => '%' . $search . '%',
+            'Listings.city LIKE' => '%' . $search . '%',
+        ];
+        }
         $this->paginate = [
             'contain' => ['Users'],
             'conditions' => ['Listings.status' => 0, 'Listings.is_suspended' => 0],
         ];
         $listings = $this->paginate($this->Listings);
     
-        $this->set(compact('listings'));
+        $this->set(compact('listings', 'search'));
     }
 
     /**

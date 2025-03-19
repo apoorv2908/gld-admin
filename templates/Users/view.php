@@ -12,7 +12,7 @@
   <meta charset="utf-8">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
 
-  <title>Dashboard - NiceAdmin Bootstrap Template</title>
+  <title><?= h($user->firstname) ?> <?= h($user->lastname) ?>: User Profile</title>
   <meta content="" name="description">
   <meta content="" name="keywords">
 
@@ -73,7 +73,9 @@
     <div class="section col-md-9 mt-2">
     <div class="countries index content">
             <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 1px solid #ddd;">
-   
+   <div>
+    <h4><?= h($user->firstname) ?> <?= h($user->lastname) ?> </h4>
+   </div>
 </div>
 
 
@@ -81,6 +83,12 @@
 
         <div class="column-responsive column-80">
             <table>
+     <tr>
+        <th><?= __('User Id') ?></th>
+
+                    <td><?= h($user->id) ?> </td>
+
+  </tr>
     <tr>
         <th><?= __('Name') ?></th>
         <td><?= h($user->firstname) ?> <?= h($user->lastname) ?></td>
@@ -101,12 +109,14 @@
 
   </tr>
 
+  
+
 
    
 
    </table>
 
-   <h4>Listings Added</h4>
+   <h4>Listings</h4>
     <?php if (!empty($user->listings)): ?>
         <table class="table table-bordered">
             <thead>
