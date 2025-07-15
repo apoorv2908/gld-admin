@@ -26,6 +26,11 @@
     <?= $this->fetch('meta') ?>
     <?= $this->fetch('script') ?>
 </head>
+<style>
+    .cac{
+        overflow-x: hidden;
+    }
+</style>
 <body>
     <nav class="top-nav">
         <div class="top-nav-title">
@@ -33,7 +38,7 @@
        
     </nav>
     <main class="main">
-        <div class="container">
+        <div class= "cac" >
             <?= $this->Flash->render() ?>
             <?= $this->fetch('content') ?>
         </div>

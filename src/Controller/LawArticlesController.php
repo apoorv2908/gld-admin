@@ -41,6 +41,30 @@ class LawArticlesController extends AppController
         $this->set(compact('lawArticles', 'search'));
     }
 
+
+    public function pendingLawArticle()
+{
+    $search = $this->request->getQuery('search');
+    $conditions = ['LawArticles.status' => 0]; // Fetch only pending articles
+
+    if ($search) {
+        $conditions['OR'] = [
+            'LawArticles.article_title LIKE' => '%' . $search . '%',
+            'LawArticles.added_by LIKE' => '%' . $search . '%',
+        ];
+    }
+
+    $this->paginate = [
+        'conditions' => $conditions,
+        'limit' => 10,
+        'order' => ['LawArticles.id' => 'asc'],
+    ];
+
+    $lawArticles = $this->paginate($this->LawArticles->find());
+
+    $this->set(compact('lawArticles', 'search'));
+}
+
     /**
      * View method
      *
@@ -81,8 +105,12 @@ class LawArticlesController extends AppController
      */
     public function add()
 {
+
+                    $this->loadModel('ArticleCategory');
+
     $lawArticle = $this->LawArticles->newEmptyEntity();
     
+
     if ($this->request->is('post')) {
         $data = $this->request->getData();
         
@@ -100,9 +128,9 @@ class LawArticlesController extends AppController
     }
 
     // Fetch the list of practice areas for the dropdown
-    $practiceAreas = $this->LawArticles->Practicearea->find('list', [
-        'keyField' => 'practice_area_id',
-        'valueField' => 'practice_area_title'
+    $practiceAreas = $this->LawArticles->ArticleCategory->find('list', [
+        'keyField' => 'id',
+        'valueField' => 'article_category'
     ])->toArray();
 
     $this->set(compact('lawArticle', 'practiceAreas'));
@@ -116,8 +144,13 @@ class LawArticlesController extends AppController
      * @return \Cake\Http\Response|null|void Redirects on successful edit, renders view otherwise.
      * @throws \Cake\Datasource\Exception\RecordNotFoundException When record not found.
      */
+
+
     public function edit($id = null)
     {
+
+                $this->loadModel('ArticleCategory');
+
         $lawArticle = $this->LawArticles->get($id, [
             'contain' => [],
         ]);
@@ -130,10 +163,13 @@ class LawArticlesController extends AppController
             $this->Flash->error(__('The law article could not be saved. Please, try again.'));
         }
 
-        $practiceAreas = $this->LawArticles->Practicearea->find('list', [
-            'keyField' => 'practice_area_id',
-            'valueField' => 'practice_area_title'
+        $practiceAreas = $this->LawArticles->ArticleCategory->find('list', [
+            'keyField' => 'id',
+            'valueField' => 'article_category'
         ])->toArray();
+
+                        \Cake\Log\Log::write('debug', 'Validation Errors: ' . json_encode($lawArticle->getErrors()));
+
     
         $this->set(compact('lawArticle', 'practiceAreas'));
     }
@@ -157,27 +193,31 @@ class LawArticlesController extends AppController
         return $this->redirect(['action' => 'index']);
     }
 
-    public function toggleStatus($id = null)
+   public function toggleStatus($id = null, $status = null)
 {
+    $this->request->allowMethod(['post', 'ajax']);
+
     try {
-        // Fetch the law article by its ID
+        // Fetch the law article by ID
         $lawArticle = $this->LawArticles->get($id);
-
-        // Toggle the status
-        $lawArticle->status = $lawArticle->status ? 0 : 1;
-
-        // Save the updated status
-        if ($this->LawArticles->save($lawArticle)) {
-            $this->Flash->success(__('The status has been changed.'));
-        } else {
-            $this->Flash->error(__('The status could not be changed. Please, try again.'));
+        
+        // Validate status values (0, 1, 2)
+        if (!in_array($status, [0, 1, 2])) {
+            throw new \Exception("Invalid status value.");
         }
-    } catch (\Cake\Datasource\Exception\RecordNotFoundException $e) {
-        $this->Flash->error(__('Law article not found.'));
-    }
 
-    // Redirect to the referring page
-    return $this->redirect($this->referer());
+        // Update status
+        $lawArticle->status = $status;
+
+        if ($this->LawArticles->save($lawArticle)) {
+            return $this->response->withType("application/json")->withStringBody(json_encode(["success" => true]));
+        } else {
+            return $this->response->withType("application/json")->withStringBody(json_encode(["success" => false]));
+        }
+    } catch (\Exception $e) {
+        return $this->response->withType("application/json")->withStringBody(json_encode(["success" => false, "error" => $e->getMessage()]));
+    }
 }
+
 
 }

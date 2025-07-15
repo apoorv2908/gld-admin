@@ -48,6 +48,9 @@ class AppController extends Controller
 
         $this->loadComponent('Authentication.Authentication');
 
+            $this->loadComponent('Authorization.Authorization'); // If using Authorization
+
+
 
         /*
          * Enable the following component for recommended CakePHP form protection settings.
@@ -58,12 +61,15 @@ class AppController extends Controller
 
     public function beforeFilter(\Cake\Event\EventInterface $event)
 {
-parent::beforeFilter($event);
-// for all controllers in our application, make index and view
-// actions public, skipping the authentication check
-if ($this->request->getAttribute('identity')) {
-    $loggedInUser = $this->request->getAttribute('identity');
-    $this->set('loggedInUser', $loggedInUser);
-}
+    parent::beforeFilter($event);
+
+    // Allow these actions without authentication
+    $this->Authentication->addUnauthenticatedActions(['admin/login']); // Only login is public
+
+    // Set logged-in user data for views (if authenticated)
+    if ($this->request->getAttribute('identity')) {
+        $loggedInUser = $this->request->getAttribute('identity');
+        $this->set('loggedInUser', $loggedInUser);
+    }
 }
 }

@@ -32,6 +32,9 @@ class AdminFixture extends TestFixture
                 'role' => 'Lorem ipsum dolor sit amet',
                 'phone' => 'Lorem ipsum dolor ',
                 'email' => 'Lorem ipsum dolor sit amet',
+                'place_of_posting' => 'Lorem ipsum dolor sit amet',
+                'status' => 1,
+                'profile' => 'Lorem ipsum dolor sit amet',
             ],
         ];
         parent::init();

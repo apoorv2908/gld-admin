@@ -50,8 +50,7 @@ class Application extends BaseApplication implements AuthenticationServiceProvid
             ]))
             ->add(new RoutingMiddleware($this))
             ->add(new BodyParserMiddleware())
-            ->add(new AuthenticationMiddleware($this))
-            ->add(new CsrfProtectionMiddleware(['httponly' => true]));
+            ->add(new AuthenticationMiddleware($this));
 
         return $middlewareQueue;
     }

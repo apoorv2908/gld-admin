@@ -10,12 +10,17 @@ use Cake\ORM\Entity;
  *
  * @property int $id
  * @property string $article_title
+ * @property string|null $short_desc
  * @property string $article_body
  * @property string $added_by
  * @property \Cake\I18n\FrozenDate $added_on
+ * @property string $user_id
  * @property string $category
  * @property int $status
- * @property string|null $views
+ * @property int|null $views
+ *
+ * @property \App\Model\Entity\ArticleCategory $article_category
+ * @property \App\Model\Entity\User $user
  */
 class LawArticle extends Entity
 {
@@ -30,11 +35,15 @@ class LawArticle extends Entity
      */
     protected $_accessible = [
         'article_title' => true,
+        'short_desc' => true,
         'article_body' => true,
         'added_by' => true,
         'added_on' => true,
+        'user_id' => true,
         'category' => true,
         'status' => true,
         'views' => true,
+        'article_category' => true,
+        'user' => true,
     ];
 }

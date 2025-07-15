@@ -42,13 +42,15 @@
 
 <?= $this->element('topbar') ?>
 <div class="row">
+<div class= "col-md-2">
 <?= $this->element('sidebar') ?>
 
+</div>
 
-    <div class="section col-md-9 mt-2">
-    <div class="countries index content">
+    <div class="section col-md-10 mt-2">
+    <div class="mx-4">
       <div class = "d-flex justify-content-between">
-      <h4><?= __('Countries List') ?></h4>
+      <h4><?= __('List of Country') ?></h4>
 </div>
    
         <hr>
@@ -66,34 +68,67 @@
         </div>
 
         <div class="table-responsive">
-            <table class="table table-striped">
-                <thead class="table-light">
-                <tr>
-                <th><?= __('Country Id') ?></th>
-                    <th><?= __('Country Code') ?></th>
-                                        <th><?= __('Country Name') ?></th>
+    <table class="table table-bordered border-dark table-sm">
+        <thead class="table-light border-dark">
+            <tr>
+                <th>S no</th>
+                <th><?= __('Country Name') ?></th>
+                <th>Status</th>
+                <th>Change Status</th> <!-- New Column -->
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php if (!empty($countries)): ?>
+                <?php foreach ($countries as $country): ?>
+                    <tr>
+                        <td><?= h($country->id) ?></td>
+                        <td><?= h($country->name) ?></td>
+                        <td>
+                            <?= ($country->status == 1) ? 'Approved' : 'Suspended' ?>
+                        </td>
+                        <td>
+                          
 
-                    <th class="actions"><?= __('Country Phone Code') ?></th>
+                            <div class="d-flex align-items-center gap-2"> <!-- Flex container with gap -->
+    <div class="flex-grow-1"> <!-- Let select take available space -->
+        <?= $this->Form->control('status', [
+            'type' => 'select',
+            'options' => $statusOptions,
+            'value' => $country->status,
+            'label' => false,
+            'class' => 'form-control' // Ensure consistent styling
+        ]) ?>
+    </div>
+    <?= $this->Form->button('Update', [
+        'class' => 'btn btn-primary flex-shrink-0' // Prevent button from growing
+    ]) ?>
+</div>
+
+
+                            <?= $this->Form->end() ?>
+                        </td>
+                       <td>
+    <a href="<?= $this->Url->build(['action' => 'edit', $country->id]) ?>" class="btn btn-primary btn-sm">
+        <?= __('Edit') ?>
+    </a>
+    <a href="<?= $this->Url->build(['action' => 'delete', $country->id]) ?>" class="btn btn-danger btn-sm" 
+       onclick="return confirm('Are you sure you want to delete this country?');">
+        <?= __('Delete') ?>
+    </a>
+</td>
+
+                    </tr>
+                <?php endforeach; ?>
+            <?php else: ?>
+                <tr>
+                    <td colspan="4" class="text-center"><?= __('No countries found') ?></td>
                 </tr>
-                </thead>
-               <tbody>
-                    <?php if (!empty($countries)): ?>
-                        <?php foreach ($countries as $country): ?>
-                            <tr>
-                                <td><?= $this->Number->format($country->id) ?></td>
-                                <td><?= h($country->shortname) ?></td>
-                                <td><?= h($country->name) ?></td>
-                                <td><?= $this->Number->format($country->phonecode) ?></td>
-                            </tr>
-                        <?php endforeach; ?>
-                    <?php else: ?>
-                        <tr>
-                            <td colspan="5" class="text-center"><?= __('No countries found') ?></td>
-                        </tr>
-                    <?php endif; ?>
-                </tbody>
-            </table>
-        </div>
+            <?php endif; ?>
+        </tbody>
+    </table>
+</div>
+
 
         <!-- Paginator -->
         <div class="paginator">

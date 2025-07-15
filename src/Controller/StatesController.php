@@ -16,27 +16,53 @@ class StatesController extends AppController
      *
      * @return \Cake\Http\Response|null|void Renders view
      */
-    public function index()
-
-    {
- $search = $this->request->getQuery('search');
-        $conditions = [];
+   public function index()
+{
+    $search = $this->request->getQuery('search');
+    $conditions = [];
     
-        if ($search) {
-            $conditions['OR'] = [
-                'States.name LIKE' => '%' . $search . '%',
-            ];
-        }
-
-        $this->paginate = [
-                        'conditions' => $conditions,
-
-            'contain' => ['Countries'],
+    if ($search) {
+        $conditions['OR'] = [
+            'States.name LIKE' => '%' . $search . '%',
         ];
-        $states = $this->paginate($this->States);
-
-        $this->set(compact('states', 'search'));
     }
+
+    // Handle status change request
+    $statusOptions = [
+        1 => 'Approved',
+        0 => 'Suspended'
+    ];
+
+    $this->paginate = [
+        'conditions' => $conditions,
+        'contain' => ['Countries'],
+    ];
+    $states = $this->paginate($this->States);
+
+    $this->set(compact('states', 'search', 'statusOptions'));
+}
+
+
+public function updateStatus($id)
+{
+    $states = $this->States->get($id);
+
+    if ($this->request->is('post')) {
+        $status = $this->request->getData('status');
+        $states->status = $status;
+
+        if ($this->States->save($states)) {
+            $this->Flash->success(__('The status has been updated.'));
+        } else {
+            $this->Flash->error(__('The status could not be updated. Please, try again.'));
+        }
+    }
+
+    return $this->redirect(['action' => 'index']);
+}
+
+
+
 
     /**
      * View method
@@ -118,5 +144,32 @@ class StatesController extends AppController
         }
 
         return $this->redirect(['action' => 'index']);
+    }
+
+    public function otherStates()
+    {
+        $search = $this->request->getQuery('search');
+    $conditions = [];
+    
+    if ($search) {
+        $conditions['OR'] = [
+            'States.name LIKE' => '%' . $search . '%',
+        ];
+    }
+
+    // Handle status change request
+    $statusOptions = [
+        1 => 'Approved',
+        0 => 'Suspended'
+    ];
+
+    $this->paginate = [
+        'conditions' => $conditions,
+        'contain' => ['Countries'],
+    ];
+    $states = $this->paginate($this->States);
+
+    $this->set(compact('states', 'search', 'statusOptions'));
+        
     }
 }

@@ -20,7 +20,16 @@ class AdminController extends AppController
     {
         $admin = $this->paginate($this->Admin);
 
-        $this->set(compact('admin'));
+         $search = $this->request->getQuery('search');
+        $conditions = [];
+    
+        if ($search) {
+            $conditions['OR'] = [
+                'Admin.name LIKE' => '%' . $search . '%',
+            ];
+        }
+
+        $this->set(compact('admin', 'search'));
 
        
     }

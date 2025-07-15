@@ -40,13 +40,15 @@
 
 <?= $this->element('topbar') ?>
 <div class="row">
-<?= $this->element('sidebar') ?>
+    <div class= "col-md-2">
+    <?= $this->element('sidebar') ?>
+    </div>
 
 
-    <div class="section col-md-9 mt-2">
-    <div class="countries index content">
+    <div class="section col-md-10 mt-2">
+    <div class="mx-4">
       <div class = "d-flex justify-content-between">
-      <h4><?= __('Listings') ?></h4>
+      <h4><?= __('All Listings') ?></h4>
 </div>
    
         <hr>
@@ -64,17 +66,19 @@
         </div>
 
         <div class="table-responsive">
-        <table class="table table-striped">
-    <thead class="table-light">
+        <table class="table table-bordered border-dark table-sm">
+    <thead class="table-light border-dark">
         <tr>
             <th><?= __('S No.') ?></th>
             <th><?= $this->Paginator->sort('listing Id') ?></th>
             <th><?= $this->Paginator->sort('name') ?></th>
+                        <th><?= $this->Paginator->sort('user Id') ?></th>
             <th><?= $this->Paginator->sort('email') ?></th>
-            <th><?= $this->Paginator->sort('listing_category') ?></th>
-            <th><?= $this->Paginator->sort('user Id') ?></th>
-            <th><?= __('Toggle Status') ?></th>
-            <th><?= __('Current Status') ?></th>
+                        <th><?= $this->Paginator->sort('listing_category') ?></th>
+            <th><?= $this->Paginator->sort('listing_type') ?></th>
+
+            <th><?= __('Listing Status') ?></th>
+            <th><?= __('Change Status') ?></th>
             <th class="actions"><?= __('Actions') ?></th>
         </tr>
     </thead>
@@ -85,41 +89,66 @@
         <tr>
             <td><?= $start + $index + 1 ?></td>
 <td>
-    <?= $this->Html->link(h($listing->listing_id), ['controller' => 'Listings', 'action' => 'view', $listing->id], ['escape' => false]) ?>
-</td>
+<?= $this->Html->link(
+    h($listing->listing_id),
+    'https://www.unitedlawhouse.com/gld_web/searchdirectory/' . 
+    (($listing->listing_type === 'Lawyer') ? 'view-lawyer-profile' : 'view-lawfirm-profile') . 
+    '/' . $listing->id,
+    ['escape' => false, 'target' => '_blank']
+) ?></td>
             <td><?= h($listing->firstname). ' ' . h($listing->lastname) ?></td>
+                        <td><?= h($listing->user_id) ?></td>
             <td><?= h($listing->email) ?></td>
             <td><?= h($listing->listing_type) ?></td>
-            <td><?= h($listing->user_id) ?></td>
+            <td>Basic</td>
+            <td style="font-size: small;">
+   <?php
+if ($listing->is_suspended == 1) {
+    $statusText = 'Suspended'; // If suspended, it should be 'Suspended' regardless of status
+} elseif ($listing->status == 1) {
+    $statusText = 'Approved'; // If not suspended and status is 1, it's 'Approved'
+} else {
+    $statusText = 'Pending for Approval'; // If status is 0 and not suspended, it's 'Pending for Approval'
+}
+?>
+
+    <?= h($statusText) ?>
+</td>
+
            <td>
     <?= $this->Form->create(null, ['url' => ['action' => 'index'], 'type' => 'post']) ?>
     <?= $this->Form->hidden('listing_id', ['value' => $listing->id]) ?>
    <?= $this->Form->select('status', [
-    '0' => '--Pending Approval--',
+    '0' => 'Pending',
     '1' => 'Approve',
     '2' => 'Suspend'
 ], [
     'value' => ($listing->status == 1) ? '1' : (($listing->is_suspended == 1) ? '2' : '0'),
     'onchange' => 'this.form.submit()',
-    'class' => 'form-control'
 ]) ?>
 
     <?= $this->Form->end() ?>
 </td>
 
-<td>
-    <?php
-    $status = $listing->listing_status;
-    $statusColor = ($status == 'Approved') ? 'green' : (($status == 'Suspended') ? 'red' : 'blue');
-    ?>
-    <span style="color: <?= $statusColor ?>; font-weight: bold;">
-        <?= h($status) ?>
-    </span>
+
+
+         <td class="actions">
+            <a href="<?= $this->Url->build([
+    'action' => ($listing->listing_type === 'Lawyer') ? 'editLawyerPage' : 'editLawfirmPage', 
+    $listing->id
+]) ?>" class="btn btn-primary text-white btn-sm">
+    <?= __('Edit') ?>
+</a>
+    <?= $this->Form->postLink(
+        __('Delete'),
+        ['action' => 'delete', $listing->id],
+        [
+            'confirm' => __('Are you sure you want to delete # {0}?', $listing->id),
+            'class' => 'text-white btn btn-danger btn-sm' // Bootstrap-styled button
+        ]
+    ) ?>
 </td>
-            <td class="actions">
-                <?= $this->Html->link(__('View'), ['action' => 'view', $listing->id]) ?>
-                <?= $this->Form->postLink(__('Delete'), ['action' => 'delete', $listing->id], ['confirm' => __('Are you sure you want to delete # {0}?', $listing->id)]) ?>
-            </td>
+
         </tr>
         <?php endforeach; ?>
     </tbody>

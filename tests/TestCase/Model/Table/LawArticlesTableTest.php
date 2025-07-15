@@ -25,6 +25,8 @@ class LawArticlesTableTest extends TestCase
      */
     protected $fixtures = [
         'app.LawArticles',
+        'app.ArticleCategory',
+        'app.Users',
     ];
 
     /**

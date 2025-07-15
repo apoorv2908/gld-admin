@@ -11,6 +11,8 @@ use Cake\Validation\Validator;
 /**
  * LawArticles Model
  *
+ * @property \App\Model\Table\UsersTable&\Cake\ORM\Association\BelongsTo $Users
+ *
  * @method \App\Model\Entity\LawArticle newEmptyEntity()
  * @method \App\Model\Entity\LawArticle newEntity(array $data, array $options = [])
  * @method \App\Model\Entity\LawArticle[] newEntities(array $data, array $options = [])
@@ -41,18 +43,16 @@ class LawArticlesTable extends Table
         $this->setDisplayField('article_title');
         $this->setPrimaryKey('id');
 
-        $this->belongsTo('Practicearea', [
-            'foreignKey' => 'category',
-            'joinType' => 'INNER'
-        ]);
-         $this->belongsTo('Users', [
+        $this->belongsTo('Users', [
             'foreignKey' => 'user_id',
             'joinType' => 'INNER',
         ]);
-        
-    }
 
-   
+          $this->belongsTo('ArticleCategory', [
+            'foreignKey' => 'id',
+            'joinType' => 'INNER',
+        ]);
+    }
 
     /**
      * Default validation rules.
@@ -69,8 +69,12 @@ class LawArticlesTable extends Table
             ->notEmptyString('article_title');
 
         $validator
+            ->scalar('short_desc')
+            ->maxLength('short_desc', 255)
+            ->allowEmptyString('short_desc');
+
+        $validator
             ->scalar('article_body')
-            ->maxLength('article_body', 255)
             ->requirePresence('article_body', 'create')
             ->notEmptyString('article_body');
 
@@ -86,6 +90,11 @@ class LawArticlesTable extends Table
             ->notEmptyDate('added_on');
 
         $validator
+            ->scalar('user_id')
+            ->maxLength('user_id', 255)
+            ->notEmptyString('user_id');
+
+        $validator
             ->scalar('category')
             ->maxLength('category', 255)
             ->requirePresence('category', 'create')
@@ -96,10 +105,23 @@ class LawArticlesTable extends Table
             ->notEmptyString('status');
 
         $validator
-            ->scalar('views')
-            ->maxLength('views', 50)
+            ->integer('views')
             ->allowEmptyString('views');
 
         return $validator;
+    }
+
+    /**
+     * Returns a rules checker object that will be used for validating
+     * application integrity.
+     *
+     * @param \Cake\ORM\RulesChecker $rules The rules object to be modified.
+     * @return \Cake\ORM\RulesChecker
+     */
+    public function buildRules(RulesChecker $rules): RulesChecker
+    {
+        $rules->add($rules->existsIn('user_id', 'Users'), ['errorField' => 'user_id']);
+
+        return $rules;
     }
 }

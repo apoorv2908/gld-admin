@@ -25,8 +25,8 @@ class ListingsTableTest extends TestCase
      */
     protected $fixtures = [
         'app.Listings',
+        'app.Countries',
         'app.Users',
-        'app.ListingsData',
     ];
 
     /**

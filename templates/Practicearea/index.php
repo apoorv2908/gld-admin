@@ -41,11 +41,13 @@
 
 <?= $this->element('topbar') ?>
 <div class="row">
-<?= $this->element('sidebar') ?>
+    <div class= "col-md-2">
+    <?= $this->element('sidebar') ?>
+    </div>
 
 
-    <div class="section col-md-9 mt-2">
-    <div class="countries index content">
+    <div class="section col-md-10 mt-2">
+    <div class="mx-4">
       <div class = "d-flex justify-content-between">
       <h4><?= __('Practice Area') ?></h4>
       <?= $this->Html->link(__('+ New Practice Area'), ['action' => 'add'], ['class' => 'btn btn-primary float-end mb-3']) ?>
@@ -66,12 +68,16 @@
         </div>
 
         <div class="table-responsive">
-            <table class="table table-striped">
-                <thead class="table-light">
+            <table class="table table-bordered border-dark table-sm">
+                <thead class="table-light border-dark">
                 <tr>
                 <th><?= __('S No.') ?></th>
                     <th><?= $this->Paginator->sort('practice_area_title') ?></th>
+                    <th><?= $this->Paginator->sort('current status') ?></th>
+                    <th><?= $this->Paginator->sort('change status') ?></th>
+
                     <th class="actions"><?= __('Actions') ?></th>
+
                 </tr>
                 </thead>
                 <tbody>
@@ -81,11 +87,48 @@
                 <tr>
                     <td><?= $start + $index + 1 ?></td>
                     <td><?= h($practice->practice_area_title) ?></td>
-                   
+                    <td>
+                            <?= ($practice->status == 1) ? 'Approved' : 'Suspended' ?>
+                        </td>
+                        <td>
+                            <?= $this->Form->create(null, ['url' => ['action' => 'updateStatus', $practice->practice_area_id]]) ?>
+                            <div class="d-flex align-items-center gap-2"> <!-- Flex container with gap -->
+    <div class="flex-grow-1"> <!-- Let select take available space -->
+        <?= $this->Form->control('status', [
+            'type' => 'select',
+            'options' => $statusOptions,
+            'value' => $practice->status,
+            'label' => false,
+            'class' => 'form-control' // Ensure consistent styling
+        ]) ?>
+    </div>
+    <?= $this->Form->button('Update', [
+        'class' => 'btn btn-primary flex-shrink-0' // Prevent button from growing
+    ]) ?>
+</div>
+                            <?= $this->Form->end() ?>
+
+
+
+                          
+                        </td>
                     <td class="actions">
-                        <?= $this->Html->link(__('Edit'), ['action' => 'edit', $practice->practice_area_id]) ?>
-                        <?= $this->Form->postLink(__('Delete'), ['action' => 'delete', $practice->practice_area_id], ['confirm' => __('Are you sure you want to delete # {0}?', $practice->practice_area_id)]) ?>
-                    </td>
+    <?= $this->Html->link(
+        ' Edit', 
+        ['action' => 'edit', $practice->practice_area_id], 
+        ['escape' => false, 'class' => 'text-white btn btn-primary btn-sm']
+    ) ?>
+    
+    <?= $this->Form->postLink(
+        ' Delete', 
+        ['action' => 'delete', $practice->practice_area_id], 
+        ['confirm' => __('Are you sure you want to delete # {0}?', $practice->practice_area_id), 
+         'escape' => false, 'class' => 'text-white btn btn-danger btn-sm']
+    ) ?>
+</td>
+
+
+                    
                 </tr>
                 <?php endforeach; ?>
             </tbody>

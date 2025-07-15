@@ -11,10 +11,7 @@ use Cake\Validation\Validator;
 /**
  * Listings Model
  *
- * @property \App\Model\Table\ListingsTable&\Cake\ORM\Association\BelongsTo $Listings
  * @property \App\Model\Table\UsersTable&\Cake\ORM\Association\BelongsTo $Users
- * @property \App\Model\Table\ListingsTable&\Cake\ORM\Association\HasMany $Listings
- * @property \App\Model\Table\ListingsDataTable&\Cake\ORM\Association\HasMany $ListingsData
  *
  * @method \App\Model\Entity\Listing newEmptyEntity()
  * @method \App\Model\Entity\Listing newEntity(array $data, array $options = [])
@@ -38,7 +35,7 @@ class ListingsTable extends Table
      * @param array $config The configuration for the Table.
      * @return void
      */
-    public function initialize(array $config): void
+     public function initialize(array $config): void
     {
         parent::initialize($config);
 
@@ -46,21 +43,21 @@ class ListingsTable extends Table
         $this->setDisplayField('firstname');
         $this->setPrimaryKey('id');
 
-        $this->belongsTo('Listings', [
-            'foreignKey' => 'listing_id',
-            'joinType' => 'INNER',
+        $this->belongsTo('Countries', [
+            'foreignKey' => 'id',
+            'joinType' => 'INNER', // Use INNER if you always want to join with existing countries
+            'propertyName' => 'countryInfo' // Unique property name
+
         ]);
-        $this->belongsTo('Users', [
-            'foreignKey' => 'user_id',
-            'joinType' => 'INNER',
-        ]);
-        $this->hasMany('Listings', [
-            'foreignKey' => 'listing_id',
-        ]);
-        $this->hasMany('ListingsData', [
-            'foreignKey' => 'listing_id',
-        ]);
+ $this->belongsTo('Users', [
+        'foreignKey' => 'user_id', // This matches the column in listings table
+        'joinType' => 'LEFT', // Use LEFT join in case listing might not exist
+        'className' => 'Users'
+    ]);
+        
     }
+
+    
 
     /**
      * Default validation rules.
@@ -70,6 +67,12 @@ class ListingsTable extends Table
      */
     public function validationDefault(Validator $validator): Validator
     {
+        $validator
+            ->scalar('salutation')
+            ->maxLength('salutation', 255)
+            ->requirePresence('salutation', 'create')
+            ->notEmptyString('salutation');
+
         $validator
             ->scalar('firstname')
             ->maxLength('firstname', 255)
@@ -110,6 +113,11 @@ class ListingsTable extends Table
             ->notEmptyString('street_address');
 
         $validator
+            ->scalar('street_address_2')
+            ->maxLength('street_address_2', 255)
+            ->allowEmptyString('street_address_2');
+
+        $validator
             ->email('email')
             ->requirePresence('email', 'create')
             ->notEmptyString('email');
@@ -117,14 +125,12 @@ class ListingsTable extends Table
         $validator
             ->scalar('website')
             ->maxLength('website', 150)
-            ->requirePresence('website', 'create')
-            ->notEmptyString('website');
+            ->allowEmptyString('website');
 
         $validator
             ->scalar('phone')
             ->maxLength('phone', 100)
-            ->requirePresence('phone', 'create')
-            ->notEmptyString('phone');
+            ->allowEmptyString('phone');
 
         $validator
             ->scalar('mobile')
@@ -146,8 +152,7 @@ class ListingsTable extends Table
         $validator
             ->scalar('affiliating_bar_council_assoc')
             ->maxLength('affiliating_bar_council_assoc', 255)
-            ->requirePresence('affiliating_bar_council_assoc', 'create')
-            ->notEmptyString('affiliating_bar_council_assoc');
+            ->allowEmptyString('affiliating_bar_council_assoc');
 
         $validator
             ->scalar('reg_no')
@@ -169,9 +174,7 @@ class ListingsTable extends Table
 
         $validator
             ->scalar('brief_detail')
-            ->maxLength('brief_detail', 255)
-            ->requirePresence('brief_detail', 'create')
-            ->notEmptyString('brief_detail');
+            ->allowEmptyString('brief_detail');
 
         $validator
             ->scalar('free_consultation')
@@ -214,6 +217,68 @@ class ListingsTable extends Table
             ->maxLength('status', 10)
             ->requirePresence('status', 'create')
             ->notEmptyString('status');
+
+        $validator
+            ->boolean('is_suspended')
+            ->allowEmptyString('is_suspended');
+
+        $validator
+            ->scalar('listing_status')
+            ->maxLength('listing_status', 255)
+            ->allowEmptyString('listing_status');
+
+        $validator
+            ->scalar('country_name')
+            ->maxLength('country_name', 255)
+            ->requirePresence('country_name', 'create')
+            ->notEmptyString('country_name');
+
+        $validator
+            ->scalar('state_name')
+            ->maxLength('state_name', 255)
+            ->requirePresence('state_name', 'create')
+            ->notEmptyString('state_name');
+
+        $validator
+            ->scalar('city_name')
+            ->maxLength('city_name', 255)
+            ->requirePresence('city_name', 'create')
+            ->notEmptyString('city_name');
+
+        $validator
+            ->scalar('practice_area_name')
+            ->maxLength('practice_area_name', 255)
+            ->requirePresence('practice_area_name', 'create')
+            ->notEmptyString('practice_area_name');
+
+        $validator
+            ->dateTime('date_added')
+            ->notEmptyDateTime('date_added');
+
+        $validator
+            ->scalar('assoc_council_name_1')
+            ->maxLength('assoc_council_name_1', 255)
+            ->allowEmptyString('assoc_council_name_1');
+
+        $validator
+            ->scalar('assoc_council_name_2')
+            ->maxLength('assoc_council_name_2', 255)
+            ->allowEmptyString('assoc_council_name_2');
+
+        $validator
+            ->scalar('assoc_council_name_3')
+            ->maxLength('assoc_council_name_3', 255)
+            ->allowEmptyString('assoc_council_name_3');
+
+        $validator
+            ->scalar('phoneCode')
+            ->maxLength('phoneCode', 50)
+            ->allowEmptyString('phoneCode');
+
+        $validator
+            ->scalar('mobileCode')
+            ->maxLength('mobileCode', 50)
+            ->allowEmptyString('mobileCode');
 
         return $validator;
     }

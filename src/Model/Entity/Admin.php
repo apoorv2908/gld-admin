@@ -16,6 +16,9 @@ use Authentication\PasswordHasher\DefaultPasswordHasher; // Add this line
  * @property string $role
  * @property string $phone
  * @property string $email
+ * @property string|null $place_of_posting
+ * @property int|null $status
+ * @property string|null $profile
  */
 class Admin extends Entity
 {
@@ -35,6 +38,9 @@ class Admin extends Entity
         'role' => true,
         'phone' => true,
         'email' => true,
+        'place_of_posting' => true,
+        'status' => true,
+        'profile' => true,
     ];
 
     /**
@@ -46,8 +52,7 @@ class Admin extends Entity
         'password',
     ];
 
-
-      protected function _setPassword(string $password) : ?string
+     protected function _setPassword(string $password) : ?string
 {
 if (strlen($password) > 0) {
 return (new DefaultPasswordHasher())->hash($password);

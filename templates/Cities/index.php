@@ -45,13 +45,15 @@
 
 <?= $this->element('topbar') ?>
 <div class="row">
+<div class= "col-md-2">
 <?= $this->element('sidebar') ?>
 
+</div>
 
-    <div class="section col-md-9 mt-2">
-    <div class="countries index content">
+    <div class="section col-md-10 mt-2">
+    <div class="mx-4">
       <div class = "d-flex justify-content-between">
-      <h4><?= __('Cities List') ?></h4>
+      <h4><?= __('List of Cities') ?></h4>
 </div>
    
         <hr>
@@ -69,22 +71,68 @@
         </div>
 
         <div class="table-responsive">
-            <table class="table table-striped">
-                <thead class="table-light">
+            <table class="table table-bordered border-dark table-sm">
+                <thead class="table-light border-dark">
                 <tr>
-                <th><?= __('Country Id') ?></th>
-                    <th><?= __('Country Code') ?></th>
-                                        <th><?= __('Cities List') ?></th>
+
+                <th>S no</th>
+                    <th><?= __('City') ?></th>
+                                        <th><?= __('State') ?></th>
+                                        <th>Status</th>
+                                                                                <th>Change Status</th>
+                                                                                                                                                                <th>Actions</th>
+
+
 
                 </tr>
                 </thead>
                <tbody>
-                <?php foreach ($cities as $city): ?>
+                                
+
+                <?php 
+                $counter = 1;
+                foreach ($cities as $city): ?>
                 <tr>
-                    <td><?= $this->Number->format($city->id) ?></td>
+                    <td><?= $counter++ ?></td>
                     <td><?= h($city->name) ?></td>
-                    <td><?= $city->has('state') ? $this->Html->link($city->state->name, ['controller' => 'States', 'action' => 'view', $city->state->id]) : '' ?></td>
-                
+                                        <td><?= h($city->state->name) ?></td>
+
+               <td>
+                            <?= ($city->status == 1) ? 'Approved' : 'Suspended' ?>
+                        </td>
+                        <td>
+                            <?= $this->Form->create(null, ['url' => ['action' => 'updateStatus', $city->id]]) ?>
+                          
+                       
+
+
+
+                            <div class="d-flex align-items-center gap-2"> <!-- Flex container with gap -->
+    <div class="flex-grow-1"> <!-- Let select take available space -->
+        <?= $this->Form->control('status', [
+            'type' => 'select',
+            'options' => $statusOptions,
+            'value' => $city->status,
+            'label' => false,
+            'class' => 'form-control' // Ensure consistent styling
+        ]) ?>
+    </div>
+    <?= $this->Form->button('Update', [
+        'class' => 'btn btn-primary flex-shrink-0' // Prevent button from growing
+    ]) ?>
+</div>
+<?= $this->Form->end() ?>
+                        </td>
+
+                            <td>
+    <a href="<?= $this->Url->build(['action' => 'edit', $city->id]) ?>" class="btn btn-primary btn-sm">
+        <?= __('Edit') ?>
+    </a>
+    <a href="<?= $this->Url->build(['action' => 'delete', $city->id]) ?>" class="btn btn-danger btn-sm" 
+       onclick="return confirm('Are you sure you want to delete this country?');">
+        <?= __('Delete') ?>
+    </a>
+</td>
                 </tr>
                 <?php endforeach; ?>
             </tbody>

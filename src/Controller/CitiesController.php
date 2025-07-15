@@ -27,12 +27,18 @@ class CitiesController extends AppController
                 'Countries.name LIKE' => '%' . $search . '%',
             ];
         }
+
+         $statusOptions = [
+        1 => 'Approved',
+        0 => 'Suspended'
+    ];
+
         $this->paginate = [
             'contain' => ['States'],
         ];
         $cities = $this->paginate($this->Cities);
 
-        $this->set(compact('cities', 'search'));
+        $this->set(compact('cities', 'search', 'statusOptions'));
     }
 
     /**
@@ -116,4 +122,52 @@ class CitiesController extends AppController
 
         return $this->redirect(['action' => 'index']);
     }
+
+
+    public function updateStatus($id)
+{
+    $city = $this->Cities->get($id);
+
+    if ($this->request->is('post')) {
+        $status = $this->request->getData('status');
+        $city->status = $status;
+
+        if ($this->Cities->save($city)) {
+            $this->Flash->success(__('The status has been updated.'));
+        } else {
+            $this->Flash->error(__('The status could not be updated. Please, try again.'));
+        }
+    }
+
+    return $this->redirect(['action' => 'index']);
 }
+
+public function otherCities()
+{
+
+    $search = $this->request->getQuery('search');
+    $conditions = [];
+
+    if ($search) {
+        $conditions['OR'] = [
+            'Countries.name LIKE' => '%' . $search . '%',
+        ];
+    }
+
+     $statusOptions = [
+    1 => 'Approved',
+    0 => 'Suspended'
+];
+
+    $this->paginate = [
+        'contain' => ['States'],
+    ];
+    $cities = $this->paginate($this->Cities);
+
+    $this->set(compact('cities', 'search', 'statusOptions'));
+    
+}
+
+}
+
+

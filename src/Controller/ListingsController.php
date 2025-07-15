@@ -30,20 +30,20 @@ class ListingsController extends AppController
             'Listings.firstname LIKE' => '%' . $search . '%',
             'Listings.lastname LIKE' => '%' . $search . '%',
             'Listings.email LIKE' => '%' . $search . '%',
-            'Listings.listing_id LIKE' => '%' . $search . '%',
-            'Listings.country LIKE' => '%' . $search . '%',
-            'Listings.state LIKE' => '%' . $search . '%',
-            'Listings.city LIKE' => '%' . $search . '%',
+            'Listings.country_name LIKE' => '%' . $search . '%',
+            'Listings.state_name LIKE' => '%' . $search . '%',
+            'Listings.city_name LIKE' => '%' . $search . '%',
         ];
         }
 
-        $this->paginate = [
-            'contain' => ['Users'],
-    'conditions' => array_merge(['Listings.is_suspended' => 0], $conditions)
-
+          $this->paginate = [
+            'conditions' => $conditions,
+            'limit' => 10,
         ];
         
-        $listings = $this->paginate($this->Listings);
+        $listings = $this->paginate($this->Listings->find());
+
+
     
         // For handling status changes via dropdown
         if ($this->request->is(['patch', 'post', 'put'])) {
@@ -97,6 +97,32 @@ class ListingsController extends AppController
         $this->paginate = [
             'contain' => ['Users'],
             'conditions' => ['Listings.is_suspended' => 1],
+        ];
+        $listings = $this->paginate($this->Listings);
+    
+        $this->set(compact('listings', 'search'));
+    }
+
+
+    public function editedListings(){
+
+        $search = $this->request->getQuery('search');
+        $conditions = [];
+    
+        if ($search) {
+            $conditions['OR'] = [
+            'Listings.firstname LIKE' => '%' . $search . '%',
+            'Listings.lastname LIKE' => '%' . $search . '%',
+            'Listings.email LIKE' => '%' . $search . '%',
+            'Listings.listing_id LIKE' => '%' . $search . '%',
+            'Listings.country LIKE' => '%' . $search . '%',
+            'Listings.state LIKE' => '%' . $search . '%',
+            'Listings.city LIKE' => '%' . $search . '%',
+        ];
+        }
+        $this->paginate = [
+            'contain' => ['Users'],
+            'conditions' => ['Listings.isedited' => 1],
         ];
         $listings = $this->paginate($this->Listings);
     
@@ -199,6 +225,246 @@ class ListingsController extends AppController
         $this->set(compact('listing', 'users'));
     }
 
+
+    public function editLawyerPage($id = null)
+{
+    $this->loadModel('Practicearea');
+    $this->loadModel('Listings');
+    $this->loadModel('Countries');
+    $this->loadModel('States');
+    $this->loadModel('Cities');
+    $this->loadModel('Users');
+
+    // Fetch practice areas and countries for dropdowns
+    $practicearea = $this->Practicearea->find('list', ['keyField' => 'practice_area_id', 'valueField' => 'practice_area_title'])->toArray();
+    $countries = $this->Countries->find('list', ['keyField' => 'id', 'valueField' => 'name'])->toArray();
+
+    $user = $this->Authentication->getIdentity();
+    
+    // Get the current listing - changed query to use listing ID or user ID
+    $listing = $this->Listings->find()
+        ->where([
+            'OR' => [
+                ['id' => $id],  // Try by listing ID first
+                ['user_id' => $id, 'listing_type' => 'Lawyer']  // Fallback to user ID
+            ]
+        ])
+        ->first();
+
+    if (!$listing) {
+        $this->Flash->error(__('Lawyer listing not found.'));
+        return $this->redirect(['action' => 'directoryOfLawyers']);
+    }
+    // Fetch states and cities based on the listing's country/state
+    $states = $this->States->find('list', ['keyField' => 'id', 'valueField' => 'name'])
+        ->where(['country_id' => $listing->country])
+        ->toArray();
+
+    $cities = $this->Cities->find('list', ['keyField' => 'id', 'valueField' => 'name'])
+        ->where(['state_id' => $listing->state])
+        ->toArray();
+
+    // Decode JSON fields if they exist
+    if (!empty($listing->court_of_practice)) {
+        $listing->court_of_practice = json_decode($listing->court_of_practice, true);
+    }
+
+    // Convert practice area string to array
+    if (!empty($listing->practice_area)) {
+        $listing->practice_area = explode(',', $listing->practice_area);
+    }
+
+    if ($this->request->is(['post', 'put'])) {
+        $data = $this->request->getData();
+
+        // Handle file upload (only if new file is uploaded)
+        if (!empty($data['remove_image'])) {
+            // Delete old image if exists
+            if (!empty($listing->image)) {
+                $oldFile = WWW_ROOT . 'img' . DS . $listing->image;
+                if (file_exists($oldFile)) {
+                    unlink($oldFile);
+                }
+            }
+            
+            $uploadedFile = $data['image'];
+            $fileName = time() . '_' . $uploadedFile->getClientFilename();
+            $filePath = WWW_ROOT . 'img' . DS . 'uploads' . DS . $fileName;
+            $uploadedFile->moveTo($filePath);
+            $data['image'] = 'uploads' . DS . $fileName;
+        } else {
+            // Keep existing image if no new file uploaded
+            unset($data['image']);
+        }
+
+        // Update location names
+        if (!empty($data['country'])) {
+            $country = $this->Countries->findById($data['country'])->first();
+            $data['country_name'] = $country->name ?? null;
+        }
+
+        if (!empty($data['state'])) {
+            $state = $this->States->findById($data['state'])->first();
+            $data['state_name'] = $state->name ?? null;
+        }
+
+        if (!empty($data['city'])) {
+            $city = $this->Cities->findById($data['city'])->first();
+            $data['city_name'] = $city->name ?? null;
+        }
+
+        // Handle practice areas
+        if (!empty($data['practice_area']) && is_array($data['practice_area'])) {
+            $data['practice_area'] = array_filter($data['practice_area']);
+            $selectedPracticeAreas = $this->Practicearea->find('list')
+                ->where(['practice_area_id IN' => $data['practice_area']])
+                ->toArray();
+            $data['practice_area'] = implode(',', $data['practice_area']);
+            $data['practice_area_name'] = implode(', ', $selectedPracticeAreas);
+        }
+
+        // Handle court of practice
+        if (isset($data['court_of_practice'])) {
+            $data['court_of_practice'] = json_encode($data['court_of_practice']);
+        }
+
+        
+
+        $listing = $this->Listings->patchEntity($listing, $data);
+
+        if ($this->Listings->save($listing)) {
+            $this->Flash->success(__('Your listing has been updated.'));
+            return $this->redirect(['controller' => 'myaccount']);
+        } else {
+            $this->Flash->error(__('Unable to update your listing. Please try again.'));
+        }
+    }
+
+    $this->set(compact('listing', 'practicearea', 'countries', 'states', 'cities'));
+    $this->render('edit_lawyer_page');
+}
+
+
+
+   public function editLawfirmPage($id = null)
+{
+    $this->loadModel('Practicearea');
+    $this->loadModel('Listings');
+    $this->loadModel('Countries');
+    $this->loadModel('States');
+    $this->loadModel('Cities');
+    $this->loadModel('Users');
+
+    // Fetch practice areas and countries for dropdowns
+    $practicearea = $this->Practicearea->find('list', ['keyField' => 'practice_area_id', 'valueField' => 'practice_area_title'])->toArray();
+    $countries = $this->Countries->find('list', ['keyField' => 'id', 'valueField' => 'name'])->toArray();
+
+    $user = $this->Authentication->getIdentity();
+    
+    // Get the current listing - changed query to use listing ID or user ID
+    $listing = $this->Listings->find()
+        ->where([
+            'OR' => [
+                ['id' => $id],  // Try by listing ID first
+                ['user_id' => $id, 'listing_type' => 'Lawyer']  // Fallback to user ID
+            ]
+        ])
+        ->first();
+
+    if (!$listing) {
+        $this->Flash->error(__('Lawyer listing not found.'));
+        return $this->redirect(['action' => 'directoryOfLawyers']);
+    }
+    // Fetch states and cities based on the listing's country/state
+    $states = $this->States->find('list', ['keyField' => 'id', 'valueField' => 'name'])
+        ->where(['country_id' => $listing->country])
+        ->toArray();
+
+    $cities = $this->Cities->find('list', ['keyField' => 'id', 'valueField' => 'name'])
+        ->where(['state_id' => $listing->state])
+        ->toArray();
+
+    // Decode JSON fields if they exist
+    if (!empty($listing->court_of_practice)) {
+        $listing->court_of_practice = json_decode($listing->court_of_practice, true);
+    }
+
+    // Convert practice area string to array
+    if (!empty($listing->practice_area)) {
+        $listing->practice_area = explode(',', $listing->practice_area);
+    }
+
+    if ($this->request->is(['post', 'put'])) {
+        $data = $this->request->getData();
+
+        // Handle file upload (only if new file is uploaded)
+        if (!empty($data['remove_image'])) {
+            // Delete old image if exists
+            if (!empty($listing->image)) {
+                $oldFile = WWW_ROOT . 'img' . DS . $listing->image;
+                if (file_exists($oldFile)) {
+                    unlink($oldFile);
+                }
+            }
+            
+            $uploadedFile = $data['image'];
+            $fileName = time() . '_' . $uploadedFile->getClientFilename();
+            $filePath = WWW_ROOT . 'img' . DS . 'uploads' . DS . $fileName;
+            $uploadedFile->moveTo($filePath);
+            $data['image'] = 'uploads' . DS . $fileName;
+        } else {
+            // Keep existing image if no new file uploaded
+            unset($data['image']);
+        }
+
+        // Update location names
+        if (!empty($data['country'])) {
+            $country = $this->Countries->findById($data['country'])->first();
+            $data['country_name'] = $country->name ?? null;
+        }
+
+        if (!empty($data['state'])) {
+            $state = $this->States->findById($data['state'])->first();
+            $data['state_name'] = $state->name ?? null;
+        }
+
+        if (!empty($data['city'])) {
+            $city = $this->Cities->findById($data['city'])->first();
+            $data['city_name'] = $city->name ?? null;
+        }
+
+        // Handle practice areas
+        if (!empty($data['practice_area']) && is_array($data['practice_area'])) {
+            $data['practice_area'] = array_filter($data['practice_area']);
+            $selectedPracticeAreas = $this->Practicearea->find('list')
+                ->where(['practice_area_id IN' => $data['practice_area']])
+                ->toArray();
+            $data['practice_area'] = implode(',', $data['practice_area']);
+            $data['practice_area_name'] = implode(', ', $selectedPracticeAreas);
+        }
+
+        // Handle court of practice
+        if (isset($data['court_of_practice'])) {
+            $data['court_of_practice'] = json_encode($data['court_of_practice']);
+        }
+
+        
+
+        $listing = $this->Listings->patchEntity($listing, $data);
+
+        if ($this->Listings->save($listing)) {
+            $this->Flash->success(__('Your listing has been updated.'));
+            return $this->redirect(['controller' => 'myaccount']);
+        } else {
+            $this->Flash->error(__('Unable to update your listing. Please try again.'));
+        }
+    }
+
+    $this->set(compact('listing', 'practicearea', 'countries', 'states', 'cities'));
+    $this->render('edit_lawfirm_page');
+}
+
+
     /**
      * Delete method
      *
@@ -218,4 +484,9 @@ class ListingsController extends AppController
 
         return $this->redirect(['action' => 'index']);
     }
+
+  
+
+
+    
 }

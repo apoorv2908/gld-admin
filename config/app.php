@@ -184,13 +184,11 @@ return [
      *   your application that still emit deprecations.
      */
     'Error' => [
-        'errorLevel' => E_ALL,
-        'skipLog' => [],
-        'log' => true,
-        'trace' => true,
-        'ignoredDeprecationPaths' => [],
+    'errorLevel' => E_ALL & ~E_USER_DEPRECATED, // Suppresses user deprecation warnings globally
+    'ignoredDeprecationPaths' => [
+        'vendor/cakephp/cakephp/src/Datasource/Paging/NumericPaginator.php', // Ignore specific file
     ],
-
+],
     /*
      * Debugger configuration
      *

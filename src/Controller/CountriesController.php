@@ -17,27 +17,49 @@ class CountriesController extends AppController
      * @return \Cake\Http\Response|null|void Renders view
      */
     public function index()
-    {
-        $search = $this->request->getQuery('search');
-        $conditions = [];
-    
-        if ($search) {
-            $conditions['OR'] = [
-                'Countries.name LIKE' => '%' . $search . '%',
-            ];
-        }
-    
-        $this->paginate = [
-            'conditions' => $conditions,
-            'limit' => 10,
-            'order' => ['Countries.name' => 'asc'],
+{
+    $search = $this->request->getQuery('search');
+    $conditions = [];
+
+    if ($search) {
+        $conditions['OR'] = [
+            'Countries.name LIKE' => '%' . $search . '%',
         ];
-    
-        $countries = $this->paginate($this->Countries->find());
-    
-        $this->set(compact('countries', 'search'));
-    
     }
+
+    $this->paginate = [
+        'conditions' => $conditions,
+        'limit' => 10,
+        'order' => ['Countries.name' => 'asc'],
+    ];
+
+    $countries = $this->paginate($this->Countries->find());
+    $statusOptions = [
+        1 => 'Approved',
+        0 => 'Suspended'
+    ];
+
+    $this->set(compact('countries', 'search', 'statusOptions'));
+}
+
+public function updateStatus($id)
+{
+    $country = $this->Countries->get($id);
+
+    if ($this->request->is('post')) {
+        $status = $this->request->getData('status');
+        $country->status = $status;
+
+        if ($this->Countries->save($country)) {
+            $this->Flash->success(__('The status has been updated.'));
+        } else {
+            $this->Flash->error(__('The status could not be updated. Please, try again.'));
+        }
+    }
+
+    return $this->redirect(['action' => 'index']);
+}
+
 
     /**
      * View method

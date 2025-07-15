@@ -41,13 +41,14 @@
 
 <?= $this->element('topbar') ?>
 <div class="row">
-<?= $this->element('sidebar') ?>
+<div class= "col-md-2">
+    <?= $this->element('sidebar') ?>
+    </div>
 
-
-    <div class="section col-md-9 mt-2">
-    <div class="countries index content">
+    <div class="section col-md-10 mt-2">
+    <div class="mx-4">
       <div class = "d-flex justify-content-between">
-      <h4><?= __('Law Articles') ?></h4>
+      <h4><?= __('All Articles') ?></h4>
 </div>
    
         <hr>
@@ -65,44 +66,55 @@
         </div>
 
         <div class="table-responsive">
-            <table class="table table-striped">
-                <thead class="table-light">
-                <tr>
-                    <th><?= $this->Paginator->sort('id') ?></th>
-                    <th><?= $this->Paginator->sort('article_title') ?></th>
-                    <th><?= $this->Paginator->sort('added_by') ?></th>
-                    <th><?= $this->Paginator->sort('added_on') ?></th>
-                    <th><?= $this->Paginator->sort('category') ?></th>
-                    <th><?= $this->Paginator->sort('status') ?></th>
-                    <th><?= $this->Paginator->sort('views') ?></th>
-                    <th class="actions"><?= __('Actions') ?></th>
-                </tr>
-                </thead>
-                <tbody>
-    <?php foreach ($lawArticles as $lawArticle): ?>
-    <tr>
-        <td><?= $this->Number->format($lawArticle->id) ?></td>
-        <td><?= h($lawArticle->article_title) ?></td>
-        <td><?= h($lawArticle->added_by) ?></td>
-        <td><?= h($lawArticle->added_on) ?></td>
-        <td><?= h($lawArticle->category) ?></td>
-        <td>
-            <?= $this->Form->postLink(
-                $lawArticle->status ? 'Approved' : 'Pending', 
-                ['action' => 'toggleStatus', $lawArticle->id], 
-                ['class' => $lawArticle->status ? 'btn btn-success' : 'btn btn-warning', 'escape' => false]
-            ) ?>
-        </td>
-        <td><?= h($lawArticle->views) ?></td>
-        <td class="actions">
-            <?= $this->Html->link(__('View'), ['action' => 'view', $lawArticle->id]) ?>
-            <?= $this->Form->postLink(__('Delete'), ['action' => 'delete', $lawArticle->id], ['confirm' => __('Are you sure you want to delete # {0}?', $lawArticle->id)]) ?>
-        </td>
-    </tr>
-    <?php endforeach; ?>
-</tbody>
+  <table class="table table-bordered table-sm border-dark">
+    <thead class="table-light border-dark">
+        <tr>
+            <th><?= $this->Paginator->sort('article id') ?></th>
+            <th><?= $this->Paginator->sort('article_title') ?></th>
+            <th><?= $this->Paginator->sort('added_on') ?></th>
+            <th><?= $this->Paginator->sort('added_by') ?></th>
+            <th>Status</th>
+            <th>Chnage Status</th>
+            <th class="actions"><?= __('Actions') ?></th>
+        </tr>
+    </thead>
+    <tbody>
+        <?php foreach ($lawArticles as $lawArticle): ?>
+        <tr>
+            <td><?= $this->Number->format($lawArticle->id) ?></td>
+<td>
+    <?= $this->Html->link(h($lawArticle->article_title), ['action' => 'edit', $lawArticle->id], ['class' => 'article-link']) ?>
+</td>            <td><?= h($lawArticle->added_on) ?></td>
+            <td><?= h($lawArticle->added_by) ?></td>
 
-            </table>
+            <!-- Current Status Column -->
+            <td>
+                <?php 
+                    $statusLabels = ['Pending', 'Approved', 'Suspended'];
+                    echo h($statusLabels[$lawArticle->status]); 
+                ?>
+            </td>
+
+            <!-- Status Dropdown -->
+            <td>
+                <select class="status-dropdown" data-id="<?= $lawArticle->id ?>">
+                    <option value="0" <?= $lawArticle->status == 0 ? 'selected' : '' ?>>Pending</option>
+                    <option value="1" <?= $lawArticle->status == 1 ? 'selected' : '' ?>>Approved</option>
+                    <option value="2" <?= $lawArticle->status == 2 ? 'selected' : '' ?>>Suspended</option>
+                </select>
+            </td>
+
+<td class="actions">    
+    <?= $this->Form->postLink('Delete', ['action' => 'delete', $lawArticle->id], [
+        'class' => 'text-white btn btn-danger btn-sm',
+        'confirm' => __('Are you sure you want to delete "{0}"?', h($lawArticle->article_title))
+    ]) ?>
+</td>
+        </tr>
+        <?php endforeach; ?>
+    </tbody>
+</table>
+
         </div>
 
         <!-- Paginator -->
@@ -122,6 +134,33 @@
 </div>
 
 <?= $this->Html->script(['main.js']) ?>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    document.querySelectorAll(".status-dropdown").forEach(dropdown => {
+        dropdown.addEventListener("change", function() {
+            let articleId = this.getAttribute("data-id");  // Get article ID
+            let newStatus = this.value;  // Get new status
+
+            fetch(`<?= $this->Url->build(['controller' => 'LawArticles', 'action' => 'toggleStatus']) ?>/${articleId}/${newStatus}`, {
+                method: "POST",
+                headers: { "X-Requested-With": "XMLHttpRequest" }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert("Status updated successfully!");
+                    location.reload();
+                } else {
+                    alert("Failed to update status.");
+                }
+            })
+            .catch(error => console.error("Error:", error));
+        });
+    });
+});
+</script>
+
 
 </body>
 </html>

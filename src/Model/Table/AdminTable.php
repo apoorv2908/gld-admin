@@ -85,6 +85,20 @@ class AdminTable extends Table
             ->requirePresence('email', 'create')
             ->notEmptyString('email');
 
+        $validator
+            ->scalar('place_of_posting')
+            ->maxLength('place_of_posting', 255)
+            ->allowEmptyString('place_of_posting');
+
+        $validator
+            ->integer('status')
+            ->allowEmptyString('status');
+
+        $validator
+            ->scalar('profile')
+            ->maxLength('profile', 255)
+            ->allowEmptyFile('profile');
+
         return $validator;
     }
 

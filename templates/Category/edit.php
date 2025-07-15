@@ -45,11 +45,13 @@
 
 <?= $this->element('topbar') ?>
 <div class="row">
-<?= $this->element('sidebar') ?>
 
+  <div class= "col-md-2">
+    <?= $this->element('sidebar') ?>
+    </div>
 
-    <div class="section col-md-9 mt-2">
-    <div class="countries index content">
+    <div class="section col-md-10 mt-2">
+    <div class="mx-4">
         <h4><?= __('Edit Category') ?></h4>
         <hr>
 
@@ -66,7 +68,7 @@
   
    
     <div class = "d-flex justify-content-end mt-3">
-    <?= $this->Form->button(__('Submit'), ['class' => 'btn btn-primary']) ?>
+    <?= $this->Form->button(__('Update'), ['class' => 'btn btn-primary']) ?>
 
         </div>
             </div>

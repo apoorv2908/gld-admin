@@ -45,11 +45,13 @@
 
 <?= $this->element('topbar') ?>
 <div class="row">
-<?= $this->element('sidebar') ?>
+    <div class= "col-md-2">
+    <?= $this->element('sidebar') ?>
+    </div>
 
 
-    <div class="section col-md-9 mt-2">
-    <div class="countries index content">
+    <div class="section col-md-10 mt-4">
+    <div class="mx-4">
         <h4><?= __('Add Category') ?></h4>
         <hr>
 
@@ -59,7 +61,8 @@
             <div class="col-12 fw-bold">
         <?= $this->Form->control('category', [
             'class' => 'form-control', 
-            'label' => ['class' => 'form-label', 'text' => 'Category Title*']
+            'label' => ['class' => 'form-label', 'text' => 'Category Title*'],
+            'placeholder' => 'Enter a Category Title'
         ]) ?>
     </div>
 

@@ -41,13 +41,16 @@
 
 <?= $this->element('topbar') ?>
 <div class="row">
-<?= $this->element('sidebar') ?>
+    <div class= "col-md-2">
+    <?= $this->element('sidebar') ?>
+
+    </div>
 
 
-    <div class="section col-md-9 mt-2">
-    <div class="countries index content">
+    <div class="section col-md-10 mt-2">
+    <div class="mx-4">
       <div class = "d-flex justify-content-between">
-      <h4><?= __('Category') ?></h4>
+      <h4><?= __('Directory Category') ?></h4>
       <?= $this->Html->link(__('+ New Category'), ['action' => 'add'], ['class' => 'btn btn-primary float-end mb-3']) ?>
 </div>
    
@@ -66,8 +69,8 @@
         </div>
 
         <div class="table-responsive">
-            <table class="table table-striped">
-                <thead class="table-light">
+            <table class="table table-bordered border-dark ">
+                <thead class="table-light border-dark">
                 <tr>
                 <th><?= __('S No.') ?></th>
                     <th><?= __('Category Title') ?></th>
@@ -79,10 +82,17 @@
                 <tr>
                     <td><?= h($category->sno) ?></td>
                     <td><?= h($category->category) ?></td>
-                    <td class="actions">
-                        <?= $this->Html->link(__('Edit'), ['action' => 'edit', $category->sno]) ?>
-                        <?= $this->Form->postLink(__('Delete'), ['action' => 'delete', $category->sno], ['confirm' => __('Are you sure you want to delete # {0}?', $category->sno)]) ?>
-                    </td>
+                   <td class="actions">
+    <?= $this->Html->link(__('Edit'), ['action' => 'edit', $category->sno], [
+        'class' => 'btn btn-primary text-white btn-sm'
+    ]) ?>
+    
+    <?= $this->Form->postLink(__('Delete'), ['action' => 'delete', $category->sno], [
+        'class' => 'btn btn-danger text-white btn-sm',
+        'confirm' => __('Are you sure you want to delete # {0}?', $category->sno)
+    ]) ?>
+</td>
+
                 </tr>
                 <?php endforeach; ?>
             </tbody>

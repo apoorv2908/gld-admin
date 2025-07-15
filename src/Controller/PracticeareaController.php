@@ -33,15 +33,23 @@ class PracticeareaController extends AppController
             'limit' => 10,
             'order' => ['Practicearea.practice_area_title' => 'asc'],
         ];
-    
+
+        $statusOptions = [
+        1 => 'Approved',
+        0 => 'Suspended'
+    ];
         $practicearea = $this->paginate($this->Practicearea->find());
 
-        $this->set(compact('practicearea', 'search'));
+        $this->set(compact('practicearea', 'search', 'statusOptions'));
     
 
 
         
     }
+
+
+
+
 
     /**
      * View method
@@ -117,6 +125,59 @@ class PracticeareaController extends AppController
         }
     
         return $this->redirect(['action' => 'index']);
+    }
+
+
+
+   public function updateStatus($id)
+{
+    $this->request->allowMethod(['post']); // Ensure only POST is allowed
+
+    $practicearea = $this->Practicearea->findByPracticeAreaId($id)->firstOrFail();
+
+    // Get the submitted status value
+    $status = $this->request->getData('status');
+    $practicearea->status = $status; // Assign new status
+
+    if ($this->Practicearea->save($practicearea)) {
+        $this->Flash->success(__('Status updated successfully.'));
+    } else {
+        $this->Flash->error(__('Failed to update status.'));
+    }
+
+    return $this->redirect(['action' => 'index']);
+}
+
+
+public function otherPracticeareas()
+    {
+
+        $search = $this->request->getQuery('search');
+        $conditions = [];
+    
+        if ($search) {
+            $conditions['OR'] = [
+                'Practicearea.practice_area_title LIKE' => '%' . $search . '%',
+            ];
+        }
+    
+        $this->paginate = [
+            'conditions' => $conditions,
+            'limit' => 10,
+            'order' => ['Practicearea.practice_area_title' => 'asc'],
+        ];
+
+        $statusOptions = [
+        1 => 'Approved',
+        0 => 'Suspended'
+    ];
+        $practicearea = $this->paginate($this->Practicearea->find());
+
+        $this->set(compact('practicearea', 'search', 'statusOptions'));
+    
+
+
+        
     }
 
   

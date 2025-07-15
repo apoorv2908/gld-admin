@@ -41,13 +41,16 @@
 
 <?= $this->element('topbar') ?>
 <div class="row">
-<?= $this->element('sidebar') ?>
+    <div class= "col-md-2">
+    <?= $this->element('sidebar') ?>
+
+    </div>
 
 
-    <div class="section col-md-9 mt-2">
-    <div class="countries index content">
+    <div class="section col-md-10 mt-2">
+    <div class="mx-4">
       <div class = "d-flex justify-content-between">
-      <h4><?= __('Users') ?></h4>
+      <h4><?= __('All Registrations') ?></h4>
 </div>
    
         <hr>
@@ -58,22 +61,26 @@
             <?= $this->Form->control('search', [
                 'label' => false,
                 'value' => $search,
-                'placeholder' => 'Search users...',
+                'placeholder' => 'Search Registrations...',
                 'class' => 'form-control'
             ]) ?>
             <?= $this->Form->end() ?>
         </div>
 
         <div class="table-responsive">
-            <table class="table table-striped">
-                <thead class="table-light">
+            <table class="table table-sm table-bordered border-dark">
+                <thead class="table-light border-dark">
                 <tr>
                 <th><?= __('S No.') ?></th>
+                                    <th><?= $this->Paginator->sort('user id') ?></th>
+
                     <th><?= $this->Paginator->sort('name') ?></th>
-                    <th><?= $this->Paginator->sort('userId') ?></th>
-                    <th><?= $this->Paginator->sort('contact info') ?></th>
-                    <th><?= $this->Paginator->sort('location info') ?></th>
-                    <th><?= $this->Paginator->sort('added_on') ?></th>
+                    <th><?= $this->Paginator->sort('email') ?></th>
+                    <th><?= $this->Paginator->sort('join_date') ?></th>
+                                        <th><?= $this->Paginator->sort('listing_type') ?></th>
+                    <th><?= $this->Paginator->sort('listing id') ?></th>
+                    <th><?= $this->Paginator->sort('listing_status') ?></th>
+
                     <th class="actions"><?= __('Actions') ?></th>
                 </tr>
                 </thead>
@@ -83,18 +90,29 @@
                 foreach ($users as $index => $user): ?>
                 <tr>
                     <td><?= $start + $index + 1 ?></td>
-                    <td>
-<?= $this->Html->link(h($user->firstname . ' ' . $user->lastname), ['controller' => 'Users', 'action' => 'view', $user->id], ['escape' => false]) ?>
+                                        <td><?= h($user->id) ?></td>
 
-                    </td>
+                   <td>
+    <?= h($user->firstname . ' ' . $user->lastname) ?>
+</td>
 
-                    <td><?= h($user->id) ?></td>
-                    <td><?= h($user->email) ?> <br><?= h($user->contact) ?></td>
-                    <td><?= h($user->country). ', ' .$user->state. ', ' .$user->city ?></td>
-                    <td><?= h($user->created) ?></td>
+
+                    <td><?= h($user->email) ?> </td>
+<td><?= h($user->created->format('Y-m-d')) ?></td>
+
+                     <td>BL </td>
+                  <td><?= h($user->listing_type == 'Lawyer' ? 'LA' : 'LF') . h($user->listingId) ?></td>
+<td><?= h($user->listingStatus == 1 ? 'Active' : 'Inactive') ?></td>
+
+
+
                     <td class="actions">
+
+                      <a href="<?= $this->Url->build(['action' => 'edit', $user->id]) ?>" class="btn btn-primary text-white btn-sm">
+        <?= __('Edit') ?>
+    </a>
 <?= $this->Form->postLink(
-    '<i class="bi bi-trash"></i> ' . __('Delete'), 
+     __('Delete'), 
     ['action' => 'delete', $user->id], 
     [
         'confirm' => __('Are you sure you want to delete # {0}?', $user->id), 
