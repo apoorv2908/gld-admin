@@ -52,14 +52,7 @@
           <div class="row justify-content-center">
             <div class="col-lg-4 col-md-6 d-flex flex-column align-items-center justify-content-center">
 
-              <div class="d-flex justify-content-center py-4">
-              <a href="index.html" class="logo d-flex justify-content-center">
-    <?= $this->Html->image('Logo3.png', [
-        'style' => 'width: auto; height: auto;' // Adjust the width and height as needed
-    ]) ?>
-</a>
-              </div><!-- End Logo -->
-
+              
               <div class="card mb-3">
 
                 <div class="card-body">
@@ -75,25 +68,17 @@
                 <!-- Bootstrap Form with CakePHP -->
                 <?= $this->Form->create(null, ['class' => 'row g-3 needs-validation', 'novalidate' => true, 'type' => 'post']) ?>
     <div class="col-12">
-        <?= $this->Form->label('email', 'Email', ['class' => 'form-label']) ?>
         <div class="input-group has-validation">
-            <?= $this->Form->text('email', ['class' => 'form-control', 'id' => 'yourUsername', 'required' => true]) ?>
+            <?= $this->Form->text('email', ['class' => 'form-control', 'id' => 'yourUsername', 'required' => true, 'placeholder' => "Email"]) ?>
             <div class="invalid-feedback">Please enter your username.</div>
         </div>
     </div>
 
     <div class="col-12">
-        <?= $this->Form->label('password', 'Password', ['class' => 'form-label']) ?>
-        <?= $this->Form->password('password', ['class' => 'form-control', 'id' => 'yourPassword', 'required' => true]) ?>
+        <?= $this->Form->password('password', ['class' => 'form-control', 'id' => 'yourPassword', 'required' => true, 'placeholder' => "Password"]) ?>
         <div class="invalid-feedback">Please enter your password!</div>
     </div>
 
-    <div class="col-12">
-        <div class="form-check">
-            <?= $this->Form->checkbox('remember', ['class' => 'form-check-input', 'value' => 'true', 'id' => 'rememberMe']) ?>
-            <?= $this->Form->label('remember', 'Remember me', ['class' => 'form-check-label', 'for' => 'rememberMe']) ?>
-        </div>
-    </div>
 
     <div class="col-12">
         <?= $this->Form->button(__('Login'), ['class' => 'btn btn-primary w-100']) ?>
